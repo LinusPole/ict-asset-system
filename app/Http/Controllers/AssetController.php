@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asset;
+use App\Models\AssetHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\AssetsExport;
 
 class AssetController extends Controller
 {
@@ -31,7 +35,7 @@ class AssetController extends Controller
         $activeAssets = Asset::where('status', 'Active')->count();
         $faultyAssets = Asset::where('status', 'Faulty')->count();
 
-        // CHART DATA (THIS IS THE FIX)
+        // Chart Data
         $chartData = Asset::select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status');
@@ -67,7 +71,14 @@ class AssetController extends Controller
             'location' => 'nullable|string|max:255',
         ]);
 
-        Asset::create($validated);
+        $asset = Asset::create($validated);
+
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'action' => 'Created',
+            'performed_by' => auth()->user()->name,
+            'description' => 'New asset was added to the system',
+        ]);
 
         return redirect('/')->with('success', 'Asset added successfully');
     }
@@ -98,8 +109,43 @@ class AssetController extends Controller
         $asset = Asset::findOrFail($id);
         $asset->update($validated);
 
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'action' => 'Updated',
+            'performed_by' => auth()->user()->name,
+            'description' => 'Asset details were updated',
+        ]);
+
         return redirect('/')->with('success', 'Asset updated successfully');
     }
+
+    /**
+     * Export PDF
+     */
+    public function exportPDF()
+    {
+        $assets = Asset::all();
+
+        $pdf = Pdf::loadView('assets.pdf', compact('assets'));
+
+        return $pdf->download('ict-assets-report.pdf');
+    }
+
+    /**
+     * Export Excel
+     */
+    public function exportExcel()
+    {
+        return Excel::download(new AssetsExport, 'ict-assets-report.xlsx');
+    }
+    public function history()
+{
+    $histories = AssetHistory::with('asset')
+        ->latest()
+        ->get();
+
+    return view('assets.history', compact('histories'));
+}
 
     /**
      * Delete asset (admin only)
@@ -111,6 +157,14 @@ class AssetController extends Controller
         }
 
         $asset = Asset::findOrFail($id);
+
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'action' => 'Deleted',
+            'performed_by' => auth()->user()->name,
+            'description' => 'Asset was deleted from the system',
+        ]);
+
         $asset->delete();
 
         return redirect('/')->with('success', 'Asset deleted successfully');

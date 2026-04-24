@@ -34,6 +34,15 @@
 
     <!-- Add Button -->
     <a href="/assets/create" class="btn btn-primary mb-4">+ Add Asset</a>
+    <a href="/assets/export/pdf" class="btn btn-success mb-4">
+    Export PDF Report
+    </a>
+    <a href="/assets/export/excel" class="btn btn-info mb-4">
+    Export Excel Report
+    </a>
+    <a href="/assets/history" class="btn btn-dark mb-4">
+    View Asset History
+    </a>
 
     <!-- DASHBOARD CARDS -->
     <div class="row mb-4 mt-3">

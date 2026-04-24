@@ -10,18 +10,18 @@ use App\Http\Controllers\ProfileController;
 |--------------------------------------------------------------------------
 */
 
-// Redirect root to dashboard (clean entry point)
+// Redirect root to dashboard
 Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
-// DASHBOARD (MAIN SYSTEM PAGE)
+// Dashboard (Main system page)
 Route::get('/dashboard', [AssetController::class, 'index'])
     ->middleware(['auth'])
     ->name('dashboard');
 
 
-// PROTECTED ROUTES (require login)
+// AUTH PROTECTED ROUTES
 Route::middleware(['auth'])->group(function () {
 
     // Asset routes
@@ -31,11 +31,20 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/assets/{id}', [AssetController::class, 'update']);
     Route::delete('/assets/{id}', [AssetController::class, 'destroy']);
 
+    // Export routes
+    Route::get('/assets/export/pdf', [AssetController::class, 'exportPDF']);
+    Route::get('/assets/export/excel', [AssetController::class, 'exportExcel']);
+
+    // ADMIN ONLY ROUTES
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/assets/history', [AssetController::class, 'history']);
+    });
+
     // Profile routes (Breeze)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Auth routes (login/register/logout)
+// Authentication routes
 require __DIR__.'/auth.php';

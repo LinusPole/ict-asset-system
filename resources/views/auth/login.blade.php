@@ -1,47 +1,105 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
+<style>
+    body {
+        background: url('/images/kilifi-bg.jpg') no-repeat center center fixed;
+        background-size: cover;
+    }
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    .login-card {
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .logo {
+        width: 90px;
+        margin: 0 auto;
+    }
+
+    .title {
+        font-weight: bold;
+        color: #0d3b66;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        color: #666;
+    }
+</style>
+
+<div class="flex justify-center items-center min-h-screen">
+
+    <div class="w-full max-w-md login-card">
+
+        <!-- LOGO -->
+        <div class="text-center mb-4">
+            <img src="{{ asset('images/kilifi-logo.jpeg') }}" class="logo" alt="Kilifi Logo">
+
+            <h3 class="title mt-3">Kilifi County Government</h3>
+            <p class="subtitle">ICT Asset Management System</p>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        <!-- Session Status -->
+        <x-auth-session-status class="mb-4" :status="session('status')" />
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        <!-- FORM -->
+        <form method="POST" action="{{ route('login') }}">
+            @csrf
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <!-- Email -->
+            <div>
+                <x-input-label for="email" :value="__('Email')" />
+                <x-text-input id="email"
+                              class="block mt-1 w-full"
+                              type="email"
+                              name="email"
+                              :value="old('email')"
+                              required autofocus />
+                <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+            <!-- Password -->
+            <div class="mt-4">
+                <x-input-label for="password" :value="__('Password')" />
+                <x-text-input id="password"
+                              class="block mt-1 w-full"
+                              type="password"
+                              name="password"
+                              required />
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
+            <!-- Remember -->
+            <div class="mt-4 flex items-center">
+                <input type="checkbox" name="remember" class="mr-2">
+                <span class="text-sm text-gray-600">Remember me</span>
+            </div>
+
+            <!-- BUTTON -->
+            <div class="mt-6 flex justify-between items-center">
+
+                <a class="text-sm text-gray-600 underline"
+                   href="{{ route('password.request') }}">
+                    Forgot password?
                 </a>
-            @endif
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
+                <x-primary-button>
+                    Login
+                </x-primary-button>
+
+            </div>
+
+        </form>
+
+        <!-- FOOTER -->
+        <div class="text-center mt-6 text-xs text-gray-500">
+            ICT Department • Kilifi County Government
         </div>
-    </form>
+
+    </div>
+</div>
+
 </x-guest-layout>
