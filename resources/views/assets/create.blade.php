@@ -28,7 +28,37 @@
 
         <input type="text" name="name" class="form-control mb-2" placeholder="Asset Name">
 
-        <input type="text" name="category" class="form-control mb-2" placeholder="Category">
+        <div class="form-group">
+    <label>Category</label>
+
+    <select name="category" class="form-control" required>
+        <option value="">-- Select ICT Equipment --</option>
+        <option value="Laptop">Laptop</option>
+        <option value="Desktop">Desktop</option>
+        <option value="Printer">Printer</option>
+        <option value="Server">Server</option>
+        <option value="Router">Router</option>
+        <option value="Switch">Switch</option>
+        <option value="Scanner">Scanner</option>
+        <option value="UPS">UPS</option>
+        <option value="Projector">Projector</option>
+        <option value="Mobile Device">Mobile Device</option>
+    </select>
+
+    <select name="department" class="form-control mb-2" required>
+    <option value="">-- Select Department --</option>
+
+    <option value="ICT" {{ old('department', $asset->department ?? '') == 'ICT' ? 'selected' : '' }}>ICT</option>
+    <option value="Health" {{ old('department', $asset->department ?? '') == 'Health' ? 'selected' : '' }}>Health</option>
+    <option value="Finance" {{ old('department', $asset->department ?? '') == 'Finance' ? 'selected' : '' }}>Finance</option>
+    <option value="Roads" {{ old('department', $asset->department ?? '') == 'Roads' ? 'selected' : '' }}>Roads</option>
+    <option value="Water" {{ old('department', $asset->department ?? '') == 'Water' ? 'selected' : '' }}>Water</option>
+    <option value="Agriculture" {{ old('department', $asset->department ?? '') == 'Agriculture' ? 'selected' : '' }}>Agriculture</option>
+    <option value="Education" {{ old('department', $asset->department ?? '') == 'Education' ? 'selected' : '' }}>Education</option>
+    <option value="Administration" {{ old('department', $asset->department ?? '') == 'Administration' ? 'selected' : '' }}>Administration</option>
+    <option value="Tourism" {{ old('department', $asset->department ?? '') == 'Tourism' ? 'selected' : '' }}>Tourism</option>
+</select>
+</div>
 
         <input type="text" name="serial_number" class="form-control mb-2" placeholder="Serial Number">
 

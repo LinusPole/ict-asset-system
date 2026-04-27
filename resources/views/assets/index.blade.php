@@ -1,20 +1,16 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ICT Assets</title>
+@extends('adminlte::page')
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+@section('title', 'Kilifi County Asset Governance System')
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
+@section('content_header')
+    <h1>ICT Asset Management Dashboard</h1>
+@stop
 
-<body>
+@section('content')
 
-<div class="container mt-5">
+<div class="container-fluid">
 
-    <!-- Header -->
+    <!-- Welcome -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Welcome, {{ auth()->user()->name }}</h4>
 
@@ -24,153 +20,255 @@
         </form>
     </div>
 
-    <h1 class="mb-4">ICT Asset Management System</h1>
+    <!-- ACTION BUTTONS -->
+    <div class="mb-4 d-flex flex-wrap gap-2 align-items-start">
 
-    <!-- Search -->
-    <form method="GET" action="/" class="mb-3 d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Search assets...">
-        <button type="submit" class="btn btn-secondary">Search</button>
+        <a href="/assets/create" class="btn btn-primary" style="min-width: 180px;">
+            + Add Asset
+        </a>
+
+        <form method="GET" action="/assets/report/pdf" class="d-flex gap-2">
+
+            <select name="department" class="form-control" style="min-width: 220px;" required>
+                <option value="">-- Select Department --</option>
+                <option value="ICT">ICT</option>
+                <option value="Health">Health</option>
+                <option value="Finance">Finance</option>
+                <option value="Roads">Roads</option>
+                <option value="Water">Water</option>
+                <option value="Agriculture">Agriculture</option>
+                <option value="Education">Education</option>
+                <option value="Administration">Administration</option>
+                <option value="Tourism">Tourism</option>
+            </select>
+
+            <button type="submit" class="btn btn-danger" style="min-width: 180px;">
+                Generate PDF
+            </button>
+
+        </form>
+
+        <a href="/assets/export/excel" class="btn btn-info" style="min-width: 180px;">
+            Export Excel
+        </a>
+
+        @if(auth()->user()->isAdmin())
+            <a href="/assets/history" class="btn btn-dark" style="min-width: 180px;">
+                View History
+            </a>
+        @endif
+
+    </div>
+
+    <!-- FILTER -->
+    <form method="GET" action="/dashboard" class="mb-3 d-flex gap-2">
+
+        <input type="text" name="search" class="form-control" placeholder="Search assets...">
+
+        <select name="department" class="form-control">
+            <option value="">All Departments</option>
+            <option value="ICT">ICT</option>
+            <option value="Health">Health</option>
+            <option value="Finance">Finance</option>
+            <option value="Roads">Roads</option>
+            <option value="Water">Water</option>
+            <option value="Agriculture">Agriculture</option>
+            <option value="Education">Education</option>
+            <option value="Administration">Administration</option>
+            <option value="Tourism">Tourism</option>
+        </select>
+
+        <button class="btn btn-secondary">Filter</button>
+
     </form>
 
-    <!-- Add Button -->
-    <a href="/assets/create" class="btn btn-primary mb-4">+ Add Asset</a>
-    <a href="/assets/export/pdf" class="btn btn-success mb-4">
-    Export PDF Report
-    </a>
-    <a href="/assets/export/excel" class="btn btn-info mb-4">
-    Export Excel Report
-    </a>
-    <a href="/assets/history" class="btn btn-dark mb-4">
-    View Asset History
-    </a>
+    <!-- CARDS -->
+    <div class="row">
 
-    <!-- DASHBOARD CARDS -->
-    <div class="row mb-4 mt-3">
-
-        <div class="col-md-4">
-            <div class="card text-white bg-primary shadow">
-                <div class="card-body">
-                    <h5>Total Assets</h5>
-                    <h2 class="mb-0">{{ $totalAssets ?? 0 }}</h2>
+        <div class="col-lg-3 col-md-6">
+            <div class="small-box bg-primary">
+                <div class="inner">
+                    <h3>{{ $totalAssets ?? 0 }}</h3>
+                    <p>Total Assets</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card text-white bg-success shadow">
-                <div class="card-body">
-                    <h5>Active Assets</h5>
-                    <h2 class="mb-0">{{ $activeAssets ?? 0 }}</h2>
+        <div class="col-lg-3 col-md-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3>{{ $activeAssets ?? 0 }}</h3>
+                    <p>Active Assets</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card text-white bg-danger shadow">
-                <div class="card-body">
-                    <h5>Faulty Assets</h5>
-                    <h2 class="mb-0">{{ $faultyAssets ?? 0 }}</h2>
+        <div class="col-lg-3 col-md-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>{{ $faultyAssets ?? 0 }}</h3>
+                    <p>Faulty Assets</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>{{ $totalMaintenance ?? 0 }}</h3>
+                    <p>Maintenance</p>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- CHART -->
-    <div class="row mb-5">
+    <!-- CHARTS -->
+    <div class="row">
+
         <div class="col-md-6">
-            <div class="card shadow">
+            <div class="card" style="height: 320px;">
+                <div class="card-header">
+                    <h3>Status Breakdown</h3>
+                </div>
                 <div class="card-body">
-                    <h5>Assets by Status</h5>
                     <canvas id="statusChart"></canvas>
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6">
+            <div class="card" style="height: 320px;">
+                <div class="card-header">
+                    <h3>Department Breakdown</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="departmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- TABLE -->
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Serial Number</th>
-                <th>Status</th>
-                <th>Assigned To</th>
-                <th>Location</th>
-                <th width="150">Actions</th>
-            </tr>
-        </thead>
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3>Asset Records</h3>
+        </div>
 
-        <tbody>
-            @forelse($assets as $asset)
-            <tr>
-                <td>{{ $asset->name }}</td>
-                <td>{{ $asset->category }}</td>
-                <td>{{ $asset->serial_number }}</td>
-                <td>{{ $asset->status }}</td>
-                <td>{{ $asset->assigned_to }}</td>
-                <td>{{ $asset->location }}</td>
-                <td>
+        <div class="card-body table-responsive">
 
-                    <!-- Edit -->
-                    <a href="/assets/{{ $asset->id }}/edit" class="btn btn-sm btn-warning">
-                        Edit
-                    </a>
+            <table class="table table-bordered table-striped">
 
-                    <!-- Delete -->
-                    @auth
-                        @if(auth()->user()->isAdmin())
-                            <form action="/assets/{{ $asset->id }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Serial</th>
+                        <th>Status</th>
+                        <th>Assigned</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
 
-                                <button type="submit" class="btn btn-sm btn-danger"
-                                    onclick="return confirm('Are you sure you want to delete this asset?')">
-                                    Delete
-                                </button>
-                            </form>
-                        @endif
-                    @endauth
+                <tbody>
+                    @forelse($assets as $asset)
+                        <tr>
+                            <td>{{ $asset->name }}</td>
+                            <td>{{ $asset->category }}</td>
+                            <td>{{ $asset->serial_number }}</td>
+                            <td>{{ $asset->status }}</td>
+                            <td>{{ $asset->assigned_to }}</td>
+                            <td>{{ $asset->location }}</td>
+                            <td>
+                                <a href="/assets/{{ $asset->id }}/edit" class="btn btn-warning btn-sm">Edit</a>
 
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="7" class="text-center">No assets found</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+                                @if(auth()->user()->isAdmin())
+                                <form method="POST" action="/assets/{{ $asset->id }}" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center">No assets found</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
 
 </div>
+@stop
 
-<!-- ✅ CHART SCRIPT (FIXED: runs after page loads) -->
+
+{{-- ================= JS SECTION ================= --}}
+@section('js')
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
-    const ctx = document.getElementById('statusChart');
+    // STATUS CHART
+    const statusCanvas = document.getElementById('statusChart');
 
-    new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: {!! json_encode($chartData->keys()) !!},
-            datasets: [{
-                label: 'Assets',
-                data: {!! json_encode($chartData->values()) !!},
-                backgroundColor: [
-                    '#28a745',
-                    '#dc3545',
-                    '#ffc107',
-                    '#0d6efd'
-                ],
-                borderWidth: 1
-            }]
-        }
-    });
+    if (statusCanvas) {
+        new Chart(statusCanvas, {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($chartData->keys()) !!},
+                datasets: [{
+                    label: 'Assets by Status',
+                    data: {!! json_encode($chartData->values()) !!},
+                    backgroundColor: [
+                        '#28a745',
+                        '#dc3545',
+                        '#ffc107',
+                        '#0d6efd'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // DEPARTMENT CHART
+    const departmentCanvas = document.getElementById('departmentChart');
+
+    if (departmentCanvas) {
+        new Chart(departmentCanvas, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($departmentChart->keys()) !!},
+                datasets: [{
+                    label: 'Assets per Department',
+                    data: {!! json_encode($departmentChart->values()) !!},
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true }
+                }
+            }
+        });
+    }
 
 });
 </script>
 
-</body>
-</html>
+@stop

@@ -9,6 +9,7 @@ class Asset extends Model
     protected $fillable = [
         'name',
         'category',
+        'department',
         'serial_number',
         'status',
         'assigned_to',
